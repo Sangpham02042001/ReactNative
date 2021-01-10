@@ -10,11 +10,18 @@ function RenderItem(props) {
 
     if (item != null) {
         return (
-            <Card
-                featuredTitle={item.name}
-                featuredSubtitle={item.designation}
-                image={require('./images/uthappizza.png')}
-            >
+            <Card>
+                <Card.Image
+                    source={require('./images/uthappizza.png')}
+                    style={{
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Card.FeaturedTitle>{item.name}</Card.FeaturedTitle>
+                    <Card.FeaturedSubtitle>{item.designation}</Card.FeaturedSubtitle>
+                </Card.Image>
                 <Text style={{ margin: 10 }}>
                     {item.description}
                 </Text>

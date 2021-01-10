@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
-import { ListItem } from 'react-native-elements';
+import { ListItem, Avatar } from 'react-native-elements';
 import { DISHES } from '../shared/dishes';
 
 class Menu extends Component {
@@ -19,14 +19,13 @@ class Menu extends Component {
     render() {
         const renderMenuItem = ({ item, index }) => {
             return (
-                <ListItem
-                    key={index}
-                    title={item.name}
-                    subtitle={item.description}
-                    hideChevron={true}
-                    onPress={() => navigate('Dishdetail', { dishId: item.id })}
-                    leftAvatar={{ source: require('./images/uthappizza.png') }}
-                />
+                <ListItem key={index} onPress={() => navigate('Dishdetail', { dishId: item.id })}>
+                    <Avatar source={require('./images/uthappizza.png')} />
+                    <ListItem.Content>
+                        <ListItem.Title>{item.name}</ListItem.Title>
+                        <ListItem.Subtitle>{item.description}</ListItem.Subtitle>
+                    </ListItem.Content>
+                </ListItem>
             );
         };
 
