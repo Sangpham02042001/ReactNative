@@ -9,7 +9,23 @@ import Menu from "./MenuComponent";
 import Dishdetail from './DishdetailComponent';
 import Home from './HomeComponent';
 import ContactUs from './ContactComponent';
-import AboutUs from './AboutComponent'
+import AboutUs from './AboutComponent';
+import Reservation from './ReservationComponent';
+
+import { connect } from 'react-redux';
+import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/ActionCreators';
+
+const mapStateToProps = state => {
+    return {
+    }
+}
+
+const mapDispatchToProps = dispatch => ({
+    fetchDishes: () => dispatch(fetchDishes()),
+    fetchComments: () => dispatch(fetchComments()),
+    fetchPromos: () => dispatch(fetchPromos()),
+    fetLeaders: () => dispatch(fetchLeaders()),
+});
 
 const MenuNavigator = createStackNavigator();
 
@@ -190,6 +206,44 @@ const CustomDrawerContentComponent = (props) => {
     )
 };
 
+const ReservationNavigator = createStackNavigator();
+
+function ReservationNavigatorScreen() {
+    return (
+        <ReservationNavigator.Navigator
+            initialRouteName='Reservation'
+            screenOptions={{
+                headerStyle: {
+                    backgroundColor: "#512DA8"
+                },
+                headerTintColor: "#fff",
+                headerTitleStyle: {
+                    color: "#fff"
+                }
+            }}
+        >
+            <ReservationNavigator.Screen
+                name="Reservation"
+                component={Reservation}
+                options={
+                    ({ navigation }) => ({
+                        headerLeft: () => (
+                            <Icon
+                                name='menu'
+                                size={24}
+                                color='white'
+                                onPress={() =>
+                                    navigation.toggleDrawer()}
+                            />
+                        )
+
+                    })
+                }
+            />
+        </ReservationNavigator.Navigator>
+    )
+}
+
 const Drawer = createDrawerNavigator();
 
 function MainNavigator({ navigation }) {
@@ -254,12 +308,33 @@ function MainNavigator({ navigation }) {
                     )
                 }}
             />
+            <Drawer.Screen
+                name="Reservation"
+                component={ReservationNavigatorScreen}
+                options={{
+                    drawerIcon: ({ tinrColor }) => (
+                        <Icon
+                            name='cutlery'
+                            type='font-awesome'
+                            size={24}
+                            color={tinrColor}
+                        />
+                    )
+                }}
+            />
         </Drawer.Navigator>
 
     );
 }
 
 class Main extends Component {
+
+    componentDidMount() {
+        this.props.fetchDishes();
+        this.props.fetchComments();
+        this.props.fetchPromos();
+        this.props.fetLeaders();
+    }
 
     render() {
 
@@ -295,4 +370,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Main;
+export default connect(mapStateToProps, mapDispatchToProps)(Main);

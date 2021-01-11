@@ -1,16 +1,21 @@
 import React, { Component } from 'react';
 import { Card, ListItem, Avatar } from 'react-native-elements';
 import { View, ScrollView, Text, FlatList } from 'react-native';
-import { LEADERS } from '../shared/leaders';
+import { connect } from 'react-redux';
+import { baseUrl } from '../shared/baseUrl';
+import { Loading } from './LoadingComponent';
+
+const mapStateToProps = state => {
+    return {
+        leaders: state.leaders,
+    }
+}
 
 
 class AboutUs extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            leaders: LEADERS,
-        }
     }
 
     static navigationOptions = {
@@ -21,7 +26,7 @@ class AboutUs extends Component {
         const renderAboutItem = ({ item, index }) => {
             return (
                 <ListItem key={index}>
-                    <Avatar rounded source={require('./images/alberto.png')} />
+                    <Avatar rounded source={{ uri: baseUrl + item.image }} />
                     <ListItem.Content>
                         <ListItem.Title style={{ fontWeight: '600' }}>
                             {item.name}
@@ -30,22 +35,44 @@ class AboutUs extends Component {
                     </ListItem.Content>
                 </ListItem>
             )
-        }
+        };
 
-        return (
-            <ScrollView>
-                <History />
-                <Card>
-                    <Card.Title>Corporate Leadership</Card.Title>
-                    <Card.Divider />
-                    <FlatList
-                        data={this.state.leaders}
-                        renderItem={renderAboutItem}
-                        keyExtractor={item => item.id}
-                    />
-                </Card>
-            </ScrollView>
-        )
+        if (this.props.leaders.isLoading) {
+            return (
+                <ScrollView>
+                    <History />
+                    <Card>
+                        <Card.Title>Corporate Leadership</Card.Title>
+                        <Loading />
+                    </Card>
+                </ScrollView>
+            );
+        } else if (this.props.leaders.errMess) {
+            return (
+                <ScrollView>
+                    <History />
+                    <Card>
+                        <Card.Title>Corporate Leadership</Card.Title>
+                        <Text>{this.props.leaders.errMess}</Text>
+                    </Card>
+                </ScrollView>
+            );
+        } else {
+            return (
+                <ScrollView>
+                    <History />
+                    <Card>
+                        <Card.Title>Corporate Leadership</Card.Title>
+                        <Card.Divider />
+                        <FlatList
+                            data={this.props.leaders.leaders}
+                            renderItem={renderAboutItem}
+                            keyExtractor={item => item.id.toString()}
+                        />
+                    </Card>
+                </ScrollView>
+            )
+        }
     }
 }
 
@@ -70,4 +97,4 @@ function History() {
     )
 }
 
-export default AboutUs;
+export default connect(mapStateToProps)(AboutUs);
