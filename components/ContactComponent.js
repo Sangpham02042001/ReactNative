@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Card } from 'react-native-elements';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 
 class ContactUs extends Component {
 
@@ -15,7 +15,7 @@ class ContactUs extends Component {
     render() {
         return (
             <Card>
-                <Card.Title style={{ fontSize: '18px' }}>Contact Information</Card.Title>
+                <Card.Title style={{ fontSize: 18 }}>Contact Information</Card.Title>
                 <Card.Divider />
                 <Text style={{
                     paddingTop: 10,
