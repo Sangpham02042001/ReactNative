@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerItemList } from '@react-navigation/drawer';
 import { Icon } from 'react-native-elements';
+import NetInfo from '@react-native-community/netinfo';
 
 import Menu from "./MenuComponent";
 import Dishdetail from './DishdetailComponent';
@@ -12,6 +13,7 @@ import ContactUs from './ContactComponent';
 import AboutUs from './AboutComponent';
 import Reservation from './ReservationComponent';
 import Favorite from './FavoriteComponent';
+import Login from './LoginComponent';
 
 import { connect } from 'react-redux';
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/ActionCreators';
@@ -283,6 +285,44 @@ function FavoriteNavigatorScreen() {
     )
 }
 
+const LoginNavigator = createStackNavigator();
+
+function LoginNavigatorScreen() {
+    return (
+        <LoginNavigator.Navigator
+            initialRouteName='Login'
+            screenOptions={{
+                headerStyle: {
+                    backgroundColor: "#512DA8"
+                },
+                headerTintColor: "#fff",
+                headerTitleStyle: {
+                    color: "#fff"
+                }
+            }}
+        >
+            <LoginNavigator.Screen
+                name="Login"
+                component={Login}
+                options={
+                    ({ navigation }) => ({
+                        headerLeft: () => (
+                            <Icon
+                                name='menu'
+                                size={24}
+                                color='white'
+                                onPress={() =>
+                                    navigation.toggleDrawer()}
+                            />
+                        )
+
+                    })
+                }
+            />
+        </LoginNavigator.Navigator>
+    )
+}
+
 const Drawer = createDrawerNavigator();
 
 function MainNavigator({ navigation }) {
@@ -294,15 +334,29 @@ function MainNavigator({ navigation }) {
             drawerContent={props => <CustomDrawerContentComponent {...props} />}
         >
             <Drawer.Screen
+                name="Login"
+                component={LoginNavigatorScreen}
+                options={{
+                    drawerIcon: ({ tintColor }) => (
+                        <Icon
+                            name='sign-in'
+                            type='font-awesome'
+                            size={24}
+                            color={tintColor}
+                        />
+                    )
+                }}
+            />
+            <Drawer.Screen
                 name="Home"
                 component={HomeNavigatorScreen}
                 options={{
-                    drawerIcon: ({ tinrColor }) => (
+                    drawerIcon: ({ tintColor }) => (
                         <Icon
                             name='home'
                             type='font-awesome'
                             size={24}
-                            color={tinrColor}
+                            color={tintColor}
                         />
                     )
                 }}
@@ -311,12 +365,12 @@ function MainNavigator({ navigation }) {
                 name="About Us"
                 component={AboutNavigatorScreen}
                 options={{
-                    drawerIcon: ({ tinrColor }) => (
+                    drawerIcon: ({ tintColor }) => (
                         <Icon
                             name='address-card'
                             type='font-awesome'
                             size={24}
-                            color={tinrColor}
+                            color={tintColor}
                         />
                     )
                 }} />
@@ -324,12 +378,12 @@ function MainNavigator({ navigation }) {
                 name="Menu"
                 component={MenuNavigatorScreen}
                 options={{
-                    drawerIcon: ({ tinrColor }) => (
+                    drawerIcon: ({ tintColor }) => (
                         <Icon
                             name='list'
                             type='font-awesome'
                             size={24}
-                            color={tinrColor}
+                            color={tintColor}
                         />
                     )
                 }} />
@@ -337,12 +391,12 @@ function MainNavigator({ navigation }) {
                 name="Contact Us"
                 component={ContactNavigatorScreen}
                 options={{
-                    drawerIcon: ({ tinrColor }) => (
+                    drawerIcon: ({ tintColor }) => (
                         <Icon
                             name='info-circle'
                             type='font-awesome'
                             size={24}
-                            color={tinrColor}
+                            color={tintColor}
                         />
                     )
                 }}
@@ -351,12 +405,12 @@ function MainNavigator({ navigation }) {
                 name="Reservation"
                 component={ReservationNavigatorScreen}
                 options={{
-                    drawerIcon: ({ tinrColor }) => (
+                    drawerIcon: ({ tintColor }) => (
                         <Icon
                             name='cutlery'
                             type='font-awesome'
                             size={24}
-                            color={tinrColor}
+                            color={tintColor}
                         />
                     )
                 }}
@@ -365,12 +419,12 @@ function MainNavigator({ navigation }) {
                 name="My Favorite"
                 component={FavoriteNavigatorScreen}
                 options={{
-                    drawerIcon: ({ tinrColor }) => (
+                    drawerIcon: ({ tintColor }) => (
                         <Icon
                             name='heart'
                             type='font-awesome'
                             size={24}
-                            color={tinrColor}
+                            color={tintColor}
                         />
                     )
                 }}
@@ -387,6 +441,35 @@ class Main extends Component {
         this.props.fetchComments();
         this.props.fetchPromos();
         this.props.fetLeaders();
+
+        NetInfo.fetch().then((connectionInfo) => {
+            ToastAndroid.show('Initial Network Connectivity Type: '
+                + connectionInfo.type, ToastAndroid.LONG)
+        });
+
+        NetInfo.addEventListener(connectionChange => this.handleConnectivityChange(connectionChange))
+    }
+
+    componentWillUnmount() {
+        NetInfo.removeEventListener(connectionChange => this.handleConnectivityChange(connectionChange))
+    }
+
+    handleConnectivityChange = (connectionInfo) => {
+        switch (connectionInfo.type) {
+            case 'none':
+                ToastAndroid.show('You are now offline', ToastAndroid.LONG);
+                break;
+            case 'wifi':
+                ToastAndroid.show('You are now on WiFi', ToastAndroid.LONG);
+                break;
+            case 'cellular':
+                ToastAndroid.show('You are now on Cellular', ToastAndroid.LONG);
+                break;
+            case 'unknown':
+                ToastAndroid.show('You are now have an Unknown connection', ToastAndroid.LONG);
+                break;
+            default:
+        }
     }
 
     render() {

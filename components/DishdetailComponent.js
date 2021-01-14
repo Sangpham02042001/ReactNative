@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Text, View, ScrollView, FlatList, Modal, Button, Alert, PanResponder } from 'react-native';
+import React, { Component, useRef } from 'react';
+import { Text, View, ScrollView, FlatList, Modal, Button, Alert, PanResponder, Share } from 'react-native';
 import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
@@ -23,21 +23,29 @@ function RenderDish(props) {
 
     const dish = props.dish;
 
-    handleViewRef = ref => this.view = ref;
+    const viewRef = useRef(null);
 
     const recognizeDrag = ({ moveX, moveY, dx, dy }) => {
-        if (dx < -200) {
+        if (dx < -100) {
             return true;
         } else {
             return false;
         }
     };
 
+    const recognizeComment = ({ moveX, moveY, dx, dy }) => {
+        if (dx > 100) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: (e, gestureState) => {
             return true;
         },
-        onPanResponderGrant: () => { this.view.rubberBand(1000).then(endState => console.log(endState.finished ? 'finished' : 'cancelled')); },
+        onPanResponderGrant: () => { viewRef.current.rubberBand(1000).then(endState => console.log(endState.finished ? 'finished' : 'cancelled')); },
         onPanResponderEnd: (e, gestureState) => {
             if (recognizeDrag(gestureState))
                 Alert.alert(
@@ -56,14 +64,27 @@ function RenderDish(props) {
                     ],
                     { cancelable: false }
                 )
+            if (recognizeComment(gestureState)) {
+                props.onAddComment();
+            }
             return true;
         }
     });
 
+    const shareDish = (title, message, url) => {
+        Share.share({
+            title: title,
+            message: title + ': ' + message + ' ' + url,
+            url: url,
+        }, {
+            dialogTitle: 'Share ' + title
+        })
+    }
+
     if (dish != null) {
         return (
             <Animatable.View animation="fadeInDown" duration={2000} delay={1000}
-                ref={this.handleViewRef}
+                ref={viewRef}
                 {...panResponder.panHandlers}>
                 <Card>
                     <Card.Image
@@ -95,6 +116,14 @@ function RenderDish(props) {
                             type='font-awesome'
                             color='#512DA8'
                             onPress={() => props.onAddComment()}
+                        />
+                        <Icon
+                            raised
+                            reverse
+                            name='share'
+                            color='#51D2A8'
+                            type='font-awesome'
+                            onPress={() => shareDish(dish.name, dish.description, baseUrl + dish.image)}
                         />
                     </View>
                 </Card>
